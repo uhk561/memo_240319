@@ -68,24 +68,24 @@ public class FileManagerService {
 		Path path = Paths.get(FILE_UPLOAD_PATH + imagePath.replace("/images/", ""));
 		
 		// 삭제할 이미지가 존재하는가?
-		if (Files.exists(path)) {
-			// 이미지 삭제
-			try {
-				Files.delete(path);
-			} catch (IOException e) {
-				log.info("[FileManagerService] 삭제 실패. path:{}", path.toString());
-				return;
-			}
-			
-			// 폴더(디렉토리) 삭제
-			path = path.getParent();
-			if (Files.exists(path)) {
-				try {
-					Files.delete(path);
-				} catch (IOException e) {
-					log.info("[FileManagerService] 디렉토리 삭제 실패. paht:{}", path.toString());
+				if (Files.exists(path)) {
+					// 이미지 삭제
+					try {
+						Files.delete(path);
+					} catch (IOException e) {
+						log.info("[FileManagerService 파일삭제] 삭제 실패. path:{}", path.toString());
+						return;
+					}
+
+					// 폴더(디렉토리) 삭제
+					path = path.getParent();
+					if (Files.exists(path)) {
+						try {
+							Files.delete(path);
+						} catch (IOException e) {
+							log.info("[FileManagerService 파일삭제] 디렉토리 삭제 실패 path:{}", path.toString());
+						}
+					}
 				}
 			}
 		}
-	}
-}

@@ -20,7 +20,7 @@
 		</div>
 
 		<div class="d-flex justify-content-between">
-			<button type="button" id="deleteBtn" class="btn btn-secondary">삭제</button>
+			<button type="button" id="deleteBtn" class="btn btn-secondary" th:data-post-id="${post.id}">삭제</button>
 
 			<div>
 				<a href="/post/post-list-view" class="btn btn-dark">목록</a>
@@ -36,11 +36,10 @@
 			// 글 수정
 			$("#saveBtn").on('click', function() {
 				//alert("글쓰기");
-				let postId = $(this).data("post-id")
+				let postId = $(this).data("post-id");
 				let subject = $("#subject").val().trim();
 				let content = $("#content").val();
-				let fileName = $("#file").val();  // C:\fakepath\테스트용.jpg
-				
+				let fileName = $("#file").val(); // C:\fakepath\flower-8557060_640.jpg
 
 				if (!subject) {
 					alert("제목을 입력하세요");
@@ -51,21 +50,20 @@
 					alert("내용을 입력하세요");
 					return;
 				}
-				
+
 				// 파일명이 비워져 있지 않으면 => 확장자 체크
 				if (fileName) {
-					//alert("파일이 있다");
-					// C:\fakepath\테스트용.jpg
+					//alert("파일이 있다.");
+					// C:\fakepath\flower-8557060_640.jpg
 					let extension = fileName.split(".").pop().toLowerCase();
 					console.log(extension);
-					
+
 					if ($.inArray(extension, ["jpg", "gif", "png"]) == -1) {
 						alert("이미지 파일만 업로드 할 수 있습니다.");
 						$("#file").val(""); // 파일을 비운다.
 						return;
 					}
 				}
-				
 
 				console.log(subject);
 				console.log(content);
@@ -81,7 +79,7 @@
 				// AJAX
 				$.ajax({
 					// request
-					type:"post"
+					type:"put"
 					, url:"/post/update"
 					, data:formData
 					, enctype:"multipart/form-data" // 파일업로드 필수 설정
@@ -99,6 +97,26 @@
 					}
 					, error:function(e) {
 						alert("글을 저장하는데 실패했습니다.");
+					}
+				});
+			});
+			$("#deleteBtn").on('click', function() {
+				let postId = $(this).data("post-id");
+				//alert(postId);
+				
+				$.ajax({
+					type:"delete"
+					, url: "/post/delete"
+					, data:{"postId":postId}
+					, success:function(data) {
+						if (data.result == "성공") {
+							location.href = "/post/post-list-view";
+						} else {
+							alert(data.error_message);
+						}
+					}
+					, error:function(e) {
+						alert("글을 삭제하는데 실패했습니다.");
 					}
 				});
 			});
