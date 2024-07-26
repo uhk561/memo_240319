@@ -4,15 +4,15 @@
  
  <mapper namespace="com.memo.post.mapper.PostMapper">
  	<select id="selectPostListTest" resultType="map">
- 		SELECT
- 			*
- 		FROM
- 			`post`
- 	</select>
- 	
- 	<select id="selectPostListByUserId" parameterType="int" resultType="com.memo.post.domain.Post">
- 		SELECT
-	 		`id`
+		SELECT
+			*
+		FROM
+			`post`
+	</select>
+	
+	<select id="selectPostListByUserId" parameterType="map" resultType="com.memo.post.domain.Post">
+		SELECT
+			`id`
 			,`userId`
 			,`subject`
 			,`content`
@@ -23,10 +23,35 @@
 			`post`
 		WHERE
 			`userId` = #{userId}
-		ORDER BY `id` DESC
- 	</select>
- 	
- 	<insert id="insertPost" parameterType="map">
+			<if test="direction == 'next'">
+			<![CDATA[
+			AND `id` < #{standardId}
+			]]>
+			ORDER BY `id` DESC
+			</if>
+			<if test="direction == 'prev'">
+			<![CDATA[
+			AND `id` > #{standardId}
+			]]>
+			</if>
+			<if test="direction == null">
+			ORDER BY `id` DESC
+			</if>
+		LIMIT ${limit}
+	</select>
+	
+	<select id="selectPostIdByUserIdAsSort" parameterType="map" resultType="int">
+		SELECT
+			`id`
+		FROM
+			`post`
+		WHERE
+			`userId` = #{userId}
+		ORDER BY `id` ${sort}
+		LIMIT 1
+	</select>
+	
+	<insert id="insertPost" parameterType="map">
 		INSERT INTO `post`
 		(
 			`userId`
@@ -49,7 +74,7 @@
 	
 	<select id="selectPostByPostIdUserId" parameterType="map" resultType="com.memo.post.domain.Post">
 		SELECT
-	 		`id`
+			`id`
 			,`userId`
 			,`subject`
 			,`content`
@@ -67,13 +92,13 @@
 		UPDATE `post`
 		SET
 			`subject` = #{subject}
-			,`content` = #{content}
+			, `content` = #{content}
 			<if test="imagePath != null">
-			,`imagePath` = #{imagePath}
+			, `imagePath` = #{imagePath}
 			</if>
 			, `updatedAt` = NOW()
 		WHERE
-			`Id` = #{postId}
+			`id` = #{postId}
 	</update>
 	
 	<delete id="deletePostByPostId" parameterType="int">
